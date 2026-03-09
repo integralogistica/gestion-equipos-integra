@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
      'rest_framework.authtoken',# Add Django REST Framework
+    'drf_spectacular',
     'sede', # Mover sede al principio de las apps personalizadas
     'empleados',
     'usuarios',
@@ -151,6 +152,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
@@ -206,4 +208,12 @@ STORAGES = {
 
 # Las URLs de los archivos ahora vendrán de Google Cloud
 MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
+
+# Configuración de Drf-Spectacular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Integra API',
+    'DESCRIPTION': 'Documentación de la API de Gestión de Equipos',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
