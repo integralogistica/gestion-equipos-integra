@@ -57,39 +57,55 @@ class IsAdminOrOwnerBySede(BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
         
-        if not user.is_authenticated:
+        # 1. Si no está autenticado, fuera.
+        if not user or not user.is_authenticated:
             return False
 
+        # 2. Superusuarios y Staff tienen permiso TOTAL SIEMPRE.
+        if getattr(user, 'is_superuser', False) or getattr(user, 'is_staff', False):
+            return True
+
+        # 3. Intentar obtener el perfil y el rol de Admin de la app
+        user_profile = None
+        user_sede = None
         try:
-            user_profile = user.profile
-            if user.is_staff or user.is_superuser or (hasattr(user_profile, 'rol') and user_profile.rol == 'ADMIN'):
-                return True
-        except UserProfile.DoesNotExist:
-            if user.is_staff or user.is_superuser:
-                return True
-            return False
+            if hasattr(user, 'profile'):
+                user_profile = user.profile
+                if user_profile:
+                    # Si tiene rol de ADMIN de la aplicación, permiso TOTAL.
+                    if getattr(user_profile, 'rol', None) == 'ADMIN':
+                        return True
+                    user_sede = user_profile.sede
+        except Exception:
+            pass
 
-        user_sede = getattr(user_profile, 'sede', None)
-        if not user_sede:
-            return False
-
+        # 4. Determinar la sede del objeto de manera ultra-segura
         obj_sede = None
-        if hasattr(obj, 'sede'):
-            obj_sede = obj.sede
-        elif hasattr(obj, 'equipo_asociado') and obj.equipo_asociado:
-            obj_sede = obj.equipo_asociado.sede
-        elif hasattr(obj, 'equipo') and obj.equipo:
-            obj_sede = obj.equipo.sede
-        elif hasattr(obj, 'user') and hasattr(obj.user, 'profile') and obj.user.profile:
-            obj_sede = obj.user.profile.sede
-        elif type(obj).__name__ == 'Sede':
-            obj_sede = obj
+        try:
+            if hasattr(obj, 'sede'):
+                obj_sede = obj.sede
+            elif hasattr(obj, 'equipo_asociado') and obj.equipo_asociado:
+                obj_sede = obj.equipo_asociado.sede
+            elif hasattr(obj, 'equipo') and obj.equipo:
+                obj_sede = obj.equipo.sede
+            elif hasattr(obj, 'user') and hasattr(obj.user, 'profile') and obj.user.profile:
+                obj_sede = obj.user.profile.sede
+            elif type(obj).__name__ == 'Sede':
+                obj_sede = obj
+        except Exception:
+            pass
         
-        # Si el objeto no tiene sede, permitimos el acceso para que pueda ser gestionado/asignado
+        # 5. Lógica de decisión final:
+        # - Si el objeto no tiene sede definida, permitimos verlo/editarlo para que alguien lo asigne.
         if obj_sede is None:
             return True
             
-        return obj_sede == user_sede
+        # - Si el usuario tiene sede y coincide con la del objeto, permiso concedido.
+        if user_sede and obj_sede == user_sede:
+            return True
+            
+        # - Por defecto, denegar para mantener la privacidad entre sedes.
+        return False
 
 class IsAdminOrSelf(BasePermission):
     """
