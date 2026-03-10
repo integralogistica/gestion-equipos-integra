@@ -85,7 +85,11 @@ class IsAdminOrOwnerBySede(BasePermission):
         elif type(obj).__name__ == 'Sede':
             obj_sede = obj
         
-        return obj_sede is not None and obj_sede == user_sede
+        # Si el objeto no tiene sede, permitimos el acceso para que pueda ser gestionado/asignado
+        if obj_sede is None:
+            return True
+            
+        return obj_sede == user_sede
 
 class IsAdminOrSelf(BasePermission):
     """
