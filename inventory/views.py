@@ -90,7 +90,8 @@ class EquipoViewSet(viewsets.ModelViewSet):
 
         # 3. Apply user-specific filtering for non-admins
         if user_profile and hasattr(user_profile, 'sede') and user_profile.sede:
-            return queryset.filter(sede=user_profile.sede)
+            # Permitimos ver equipos de su sede O equipos que no tienen sede asignada aún
+            return queryset.filter(Q(sede=user_profile.sede) | Q(sede__isnull=True))
         
         return Equipo.objects.none()
     
