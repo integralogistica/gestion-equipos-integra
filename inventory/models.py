@@ -291,3 +291,36 @@ class HistorialMovimientoEquipo(models.Model):
 
     def __str__(self):
         return f"Movimiento de {self.equipo_nombre} - {self.equipo_serial}"
+
+class ReporteIncidente(models.Model):
+    TIPO_INCIDENTE_CHOICES = [
+        ('Caída / Golpe', 'Caída / Golpe'),
+        ('Derrame de Líquido', 'Derrame de Líquido'),
+        ('Robo / Pérdida', 'Robo / Pérdida'),
+        ('Falla Técnica Grave', 'Falla Técnica Grave'),
+        ('Desgaste Natural', 'Desgaste Natural'),
+        ('Uso Indebido', 'Uso Indebido'),
+        ('Otro', 'Otro'),
+    ]
+    RESOLUCION_CHOICES = [
+        ('Reparación Interna', 'Reparación Interna'),
+        ('Garantía Fabricante', 'Garantía Fabricante'),
+        ('Baja Total - Reposición', 'Baja Total - Reposición'),
+        ('Cargo a Colaborador', 'Cargo a Colaborador'),
+        ('Cerrado sin Acción', 'Cerrado sin Acción'),
+    ]
+
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='incidentes')
+    empleado = models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True, blank=True)
+    tipo_incidente = models.CharField(max_length=50, choices=TIPO_INCIDENTE_CHOICES)
+    descripcion = models.TextField()
+    fecha_incidente = models.DateField(auto_now_add=True)
+    resolucion = models.CharField(max_length=50, choices=RESOLUCION_CHOICES, default='Reparación Interna')
+    equipo_nuevo = models.ForeignKey(Equipo, on_delete=models.SET_NULL, null=True, blank=True, related_name='reposicion_de')
+    evidencia_foto = models.ImageField(upload_to='incidentes_fotos/', null=True, blank=True)
+    costo_estimado = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    creado_en = models.DateTimeField(auto_now_add=True)
+    creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"Incidente {self.tipo_incidente} - {self.equipo.nombre}"
