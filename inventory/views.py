@@ -177,18 +177,20 @@ class MantenimientoViewSet(viewsets.ModelViewSet):
         # Obtener la fecha para el próximo mantenimiento del equipo desde los datos validados
         fecha_proximo_mantenimiento_equipo = serializer.validated_data.get('fecha_proximo_mantenimiento_equipo', None)
         
-        equipo = instance.equipo
+        # Obtener el equipo de forma segura
+        equipo = getattr(instance, 'equipo', None)
         
-        # Actualizar la fecha del último mantenimiento del equipo si el estado es 'Finalizado'
-        if instance.estado_mantenimiento == 'Finalizado' and instance.fecha_finalizacion:
-            equipo.fecha_ultimo_mantenimiento = instance.fecha_finalizacion
-        
-        # Si se proporcionó una nueva fecha para el próximo mantenimiento, actualizar el equipo
-        if fecha_proximo_mantenimiento_equipo:
-            equipo.fecha_proximo_mantenimiento = fecha_proximo_mantenimiento_equipo
-        
-        # Guardar los cambios en el equipo
-        equipo.save()
+        if equipo:
+            # Actualizar la fecha del último mantenimiento del equipo si el estado es 'Finalizado'
+            if instance.estado_mantenimiento == 'Finalizado' and instance.fecha_finalizacion:
+                equipo.fecha_ultimo_mantenimiento = instance.fecha_finalizacion
+            
+            # Si se proporcionó una nueva fecha para el próximo mantenimiento, actualizar el equipo
+            if fecha_proximo_mantenimiento_equipo:
+                equipo.fecha_proximo_mantenimiento = fecha_proximo_mantenimiento_equipo
+            
+            # Guardar los cambios en el equipo
+            equipo.save()
 
     def perform_update(self, serializer):
         instance = serializer.save()
@@ -196,18 +198,20 @@ class MantenimientoViewSet(viewsets.ModelViewSet):
         # Obtener la fecha para el próximo mantenimiento del equipo desde los datos validados
         fecha_proximo_mantenimiento_equipo = serializer.validated_data.get('fecha_proximo_mantenimiento_equipo', None)
         
-        equipo = instance.equipo
+        # Obtener el equipo de forma segura
+        equipo = getattr(instance, 'equipo', None)
         
-        # Actualizar la fecha del último mantenimiento del equipo si el estado es 'Finalizado'
-        if instance.estado_mantenimiento == 'Finalizado' and instance.fecha_finalizacion:
-            equipo.fecha_ultimo_mantenimiento = instance.fecha_finalizacion
-        
-        # Si se proporcionó una nueva fecha para el próximo mantenimiento, actualizar el equipo
-        if fecha_proximo_mantenimiento_equipo:
-            equipo.fecha_proximo_mantenimiento = fecha_proximo_mantenimiento_equipo
-        
-        # Guardar los cambios en el equipo
-        equipo.save()
+        if equipo:
+            # Actualizar la fecha del último mantenimiento del equipo si el estado es 'Finalizado'
+            if instance.estado_mantenimiento == 'Finalizado' and instance.fecha_finalizacion:
+                equipo.fecha_ultimo_mantenimiento = instance.fecha_finalizacion
+            
+            # Si se proporcionó una nueva fecha para el próximo mantenimiento, actualizar el equipo
+            if fecha_proximo_mantenimiento_equipo:
+                equipo.fecha_proximo_mantenimiento = fecha_proximo_mantenimiento_equipo
+            
+            # Guardar los cambios en el equipo
+            equipo.save()
 
 
 # Vistas para el modelo Periferico
