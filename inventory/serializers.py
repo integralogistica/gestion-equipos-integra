@@ -266,6 +266,7 @@ class HistorialMovimientoEquipoSerializer(serializers.ModelSerializer):
     equipo_nombre = serializers.CharField(read_only=True)
     equipo_serial = serializers.CharField(read_only=True)
     empleado_nombre = serializers.SerializerMethodField()
+    responsable_custodia_info = serializers.SerializerMethodField()
     
     class Meta:
         model = HistorialMovimientoEquipo
@@ -275,3 +276,12 @@ class HistorialMovimientoEquipoSerializer(serializers.ModelSerializer):
         if obj.empleado_asignado:
             return f"{obj.empleado_asignado.nombre} {obj.empleado_asignado.apellido}"
         return "Sin asignar"
+
+    def get_responsable_custodia_info(self, obj):
+        if obj.responsable_custodia:
+            return {
+                'id': obj.responsable_custodia.id,
+                'nombre_completo': f"{obj.responsable_custodia.nombre} {obj.responsable_custodia.apellido}",
+                'cargo': obj.responsable_custodia.cargo
+            }
+        return None

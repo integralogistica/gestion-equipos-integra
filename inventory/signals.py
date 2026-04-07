@@ -163,10 +163,12 @@ def log_equipo_movement(sender, instance, created, **kwargs):
                 
                 if historial_activo:
                     historial_activo.fecha_devolucion = timezone.now()
-                    historial_activo.observacion_devolucion = "Devolución o cambio de asignación"
+                    historial_activo.observacion_devolucion = instance.notas_custodia or "Devolución recibida satisfactoriamente"
+                    
+                    # CAPTURAR RESPONSABLE DE CUSTODIA (NUEVO)
+                    historial_activo.responsable_custodia = instance.responsable_custodia
                     
                     # CAPTURAR FOTO DE DEVOLUCIÓN
-                    # Nota: Usamos los valores actuales de la instancia ya que representan el estado al recibir
                     historial_activo.ram_devolucion = instance.ram
                     historial_activo.rom_devolucion = instance.rom
                     historial_activo.so_devolucion = instance.sistema_operativo
