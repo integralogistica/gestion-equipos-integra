@@ -34,7 +34,13 @@ class Equipo(models.Model):
     redes_conectadas = models.TextField(blank=True, null=True, verbose_name="Redes Conectadas")
     
     # --- SECCIÓN: Estado y Ubicación ---
-    estado_tecnico = models.CharField(max_length=50, choices=[('Nuevo', 'Nuevo'), ('Reacondicionado', 'Reacondicionado')], default='Nuevo', verbose_name="Estado Técnico")
+    estado_tecnico = models.CharField(max_length=50, choices=[
+        ('Nuevo', 'Nuevo'),
+        ('Reacondicionado', 'Reacondicionado'),
+        ('Usado - Excelente', 'Usado - Excelente'),
+        ('Usado - Regular', 'Usado - Regular'),
+        ('En Obsolescencia', 'En Obsolescencia'),
+    ], default='Nuevo', verbose_name="Estado Técnico")
     estado_disponibilidad = models.CharField(max_length=50, choices=[('Disponible', 'Disponible'), ('Asignado', 'Asignado'), ('Reservado', 'Reservado'), ('No disponible por daño', 'No disponible por mantenimiento')], default='Disponible', verbose_name="Estado de Disponibilidad")
     sede = models.ForeignKey(Sede, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Sede")
     activo = models.BooleanField(default=True, verbose_name="Activo")
