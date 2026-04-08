@@ -8,7 +8,7 @@ from .views import (
     LicenciaListCreateAPIView, LicenciaRetrieveUpdateDestroyAPIView,
     PasisalvoListCreateAPIView, PasisalvoRetrieveUpdateDestroyAPIView,
     DashboardStatsView, HistorialPerifericoListAPIView, HistorialEquipoListView, HistorialMovimientoEquipoListAPIView,
-    clearance_info
+    clearance_info, ReporteIncidenteListCreateAPIView
 )
 
 # Crear un router y registrar nuestros viewsets con él.
@@ -46,4 +46,7 @@ urlpatterns = [
 
     # URL para las estadísticas del Dashboard
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard-stats'),
+
+    # URLs para Reporte de Incidentes (siniestros / daños)
+    path('incidentes/', ReporteIncidenteListCreateAPIView.as_view(), name='incidente-list-create'),
 ]

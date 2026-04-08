@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from sede.models import Sede # Importado desde sede.models
 from mantenimientos.models import Mantenimiento # Importado desde mantenimientos.models
-from .models import Equipo, Periferico, Licencia, Pasisalvo, HistorialEquipo, HistorialMovimientoEquipo
+from .models import Equipo, Periferico, Licencia, Pasisalvo, HistorialEquipo, HistorialMovimientoEquipo, ReporteIncidente
 from .models import HistorialPeriferico
 from usuarios.serializers import UserSerializer # Importar UserSerializer
 
@@ -266,7 +266,8 @@ class HistorialMovimientoEquipoSerializer(serializers.ModelSerializer):
     equipo_nombre = serializers.CharField(read_only=True)
     equipo_serial = serializers.CharField(read_only=True)
     empleado_nombre = serializers.SerializerMethodField()
-    responsable_custodia_info = serializers.SerializerMethodField()
+    # NOTA: responsable_custodia_info fue eliminado — el modelo HistorialMovimientoEquipo
+    # no tiene ese campo, lo cual causaba un AttributeError (500) al listar movimientos.
     
     class Meta:
         model = HistorialMovimientoEquipo
@@ -277,11 +278,21 @@ class HistorialMovimientoEquipoSerializer(serializers.ModelSerializer):
             return f"{obj.empleado_asignado.nombre} {obj.empleado_asignado.apellido}"
         return "Sin asignar"
 
-    def get_responsable_custodia_info(self, obj):
-        if obj.responsable_custodia:
-            return {
-                'id': obj.responsable_custodia.id,
-                'nombre_completo': f"{obj.responsable_custodia.nombre} {obj.responsable_custodia.apellido}",
-                'cargo': obj.responsable_custodia.cargo
-            }
-        return None
+
+class ReporteIncidenteSerializer(serializers.ModelSerializer):
+    """
+    Serializer para el modelo ReporteIncidente.
+    El frontend lo consume en GET /api/incidentes/?equipo=<id> y POST /api/incidentes/
+    """
+    equipo_nombre = serializers.CharField(source='equipo.nombre', read_only=True)
+    creado_por_username = serializers.CharField(source='creado_por.username', read_only=True, allow_null=True)
+
+    class Meta:
+        model = ReporteIncidente
+        fields = [
+            'id', 'equipo', 'equipo_nombre', 'empleado',
+            'tipo_incidente', 'descripcion', 'fecha_incidente',
+            'resolucion', 'equipo_nuevo', 'evidencia_foto',
+            'costo_estimado', 'creado_en', 'creado_por', 'creado_por_username'
+        ]
+        read_only_fields = ['fecha_incidente', 'creado_en', 'creado_por', 'creado_por_username', 'equipo_nombre']

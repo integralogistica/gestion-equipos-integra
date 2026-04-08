@@ -9,11 +9,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from sede.models import Sede
 from mantenimientos.models import Mantenimiento
-from .models import Equipo, Periferico, Licencia, Pasisalvo, HistorialPeriferico, HistorialEquipo, HistorialMovimientoEquipo
+from .models import Equipo, Periferico, Licencia, Pasisalvo, HistorialPeriferico, HistorialEquipo, HistorialMovimientoEquipo, ReporteIncidente
 from usuarios.models import UserProfile
 from usuarios.permissions import IsAdminOrOwnerBySede # <-- IMPORTAR
 from django.db.models import Count, Q, F
-from .serializers import SedeSerializer, EquipoSerializer, MantenimientoSerializer, PerifericoSerializer, LicenciaSerializer, PasisalvoSerializer, HistorialPerifericoSerializer, HistorialEquipoSerializer, HistorialMovimientoEquipoSerializer
+from .serializers import SedeSerializer, EquipoSerializer, MantenimientoSerializer, PerifericoSerializer, LicenciaSerializer, PasisalvoSerializer, HistorialPerifericoSerializer, HistorialEquipoSerializer, HistorialMovimientoEquipoSerializer, ReporteIncidenteSerializer
 import django_filters.rest_framework
 from rest_framework import viewsets
 
@@ -676,3 +676,24 @@ def clearance_info(request, empleado_id):
         "esta_a_paz_y_salvo": equipos_activos.count() == 0 and perifericos_activos.count() == 0
     }
     return Response(data)
+
+
+class ReporteIncidenteListCreateAPIView(generics.ListCreateAPIView):
+    """
+    GET  /api/incidentes/          → lista todos los incidentes
+    GET  /api/incidentes/?equipo=X → filtra por equipo (usado por el frontend en editar equipo)
+    POST /api/incidentes/          → crea un nuevo reporte de incidente
+    """
+    serializer_class = ReporteIncidenteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = ReporteIncidente.objects.all().order_by('-creado_en')
+        equipo_id = self.request.query_params.get('equipo')
+        if equipo_id:
+            queryset = queryset.filter(equipo_id=equipo_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(creado_por=self.request.user)
+
