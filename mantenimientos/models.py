@@ -30,7 +30,8 @@ class Mantenimiento(models.Model):
     estado_mantenimiento = models.CharField(max_length=50, choices=ESTADO_MANTENIMIENTO_CHOICES, default='Pendiente')
     
     # Fechas
-    fecha_inicio = models.DateField(default=date.today)
+    fecha_inicio = models.DateField(default=date.today, help_text="Fecha programada o de registro")
+    fecha_real_inicio = models.DateField(null=True, blank=True, help_text="Fecha en la que realmente se inició el proceso")
     fecha_finalizacion = models.DateField(null=True, blank=True, help_text="Fecha límite estimada")
     fecha_real_finalizacion = models.DateField(null=True, blank=True, help_text="Fecha en la que realmente se marcó como finalizado")
 

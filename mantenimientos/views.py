@@ -119,7 +119,8 @@ class MantenimientoViewSet(viewsets.ModelViewSet):
             )
         
         instance.estado_mantenimiento = 'En proceso'
-        instance.save(update_fields=['estado_mantenimiento'])
+        instance.fecha_real_inicio = timezone.now().date()
+        instance.save()
         
         # Registrar en el historial
         from .models import HistorialAccionMantenimiento

@@ -107,19 +107,27 @@ class MantenimientoSerializer(serializers.ModelSerializer):
             return os.path.basename(obj.evidencia_finalizacion.name)
         return None
 
+    # Campo para el poseedor actual del equipo
+    poseedor_actual = serializers.SerializerMethodField()
+    
+    def get_poseedor_actual(self, obj):
+        if obj.equipo and obj.equipo.empleado_asignado:
+            return f"{obj.equipo.empleado_asignado.nombres} {obj.equipo.empleado_asignado.apellidos}"
+        return "No asignado"
+
     class Meta:
         model = Mantenimiento
         fields = [
-            'id', 'equipo', 'equipo_nombre', 'equipo_tipo', 'equipo_asociado_nombre', 'sede', 'sede_nombre',
+            'id', 'equipo', 'equipo_nombre', 'equipo_tipo', 'equipo_asociado_nombre', 'poseedor_actual', 'sede', 'sede_nombre',
             'responsable', 'responsable_nombre', 'usuario_responsable_username',
             'tipo_mantenimiento', 'estado_mantenimiento',
-            'fecha_inicio', 'fecha_finalizacion', 'fecha_real_finalizacion', 'fuera_de_fecha',
+            'fecha_inicio', 'fecha_real_inicio', 'fecha_finalizacion', 'fecha_real_finalizacion', 'fuera_de_fecha',
             'descripcion_problema', 'acciones_realizadas', 'repuestos_utilizados',
             'notas', 'creado_en', 'actualizado_en',
             'evidencias', 'evidencias_uploads',
             'evidencia_finalizacion', 'evidencia_finalizacion_url', 'evidencia_finalizacion_filename'
         ]
-        read_only_fields = ('creado_en', 'actualizado_en', 'fecha_inicio', 'fecha_real_finalizacion')
+        read_only_fields = ('creado_en', 'actualizado_en', 'fecha_inicio', 'fecha_real_inicio', 'fecha_real_finalizacion')
 
     def to_internal_value(self, data):
         """
