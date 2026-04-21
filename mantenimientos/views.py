@@ -165,6 +165,12 @@ class MantenimientoViewSet(viewsets.ModelViewSet):
         # IMPORTANTE: Guardamos en fecha_real_finalizacion, NO sobreescribimos fecha_finalizacion
         instance.fecha_real_finalizacion = timezone.now().date()
         instance.evidencia_finalizacion = evidencia_file
+        
+        # Opcionalmente actualizar acciones realizadas si se proporcionan al finalizar
+        acciones = request.data.get('acciones_realizadas')
+        if acciones:
+            instance.acciones_realizadas = acciones
+            
         instance.save()
 
         # Registrar en el historial
