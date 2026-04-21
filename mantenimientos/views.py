@@ -23,6 +23,11 @@ class MantenimientoViewSet(viewsets.ModelViewSet):
         if estado_param:
             queryset = queryset.filter(estado_mantenimiento=estado_param)
 
+        # Aplicar filtro por equipo_id si está en los parámetros
+        equipo_id = self.request.query_params.get('equipo')
+        if equipo_id and equipo_id.strip():
+            queryset = queryset.filter(equipo_id=equipo_id)
+
         is_admin = False
         user_profile = None
         try:

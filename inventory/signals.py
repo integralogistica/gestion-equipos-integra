@@ -151,7 +151,7 @@ def log_equipo_movement(sender, instance, created, **kwargs):
     # 2. Caso: Actualización de equipo
     elif old_instance:
         # Cambio de empleado (Asignación o Reasignación o Devolución)
-        if instance.empleado_asignado != old_instance.empleado_asignado:
+        if instance.empleado_asignado_id != old_instance.empleado_asignado_id:
             # Si había un empleado anterior, cerrar su registro de movimiento (Devolución)
             if old_instance.empleado_asignado:
                 historial_activo = HistorialMovimientoEquipo.objects.filter(

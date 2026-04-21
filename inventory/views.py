@@ -157,6 +157,11 @@ class MantenimientoViewSet(viewsets.ModelViewSet):
         if not user.is_authenticated:
             return Mantenimiento.objects.none()
 
+        # Aplicar filtro por equipo_id si está en los parámetros
+        equipo_id = self.request.query_params.get('equipo')
+        if equipo_id and equipo_id.strip():
+            return Mantenimiento.objects.filter(equipo_id=equipo_id).order_by('-fecha_inicio')
+
         try:
             user_profile = user.profile
             if user.is_staff or user.is_superuser or (hasattr(user_profile, 'rol') and user_profile.rol == 'ADMIN'):
@@ -444,6 +449,12 @@ class HistorialMovimientoEquipoListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
+        
+        # Filtro por equipo_id ( Prioridad máxima para UI de editar equipo )
+        equipo_id = self.request.query_params.get('equipo')
+        if equipo_id and equipo_id.strip():
+            return HistorialMovimientoEquipo.objects.filter(equipo_id=equipo_id).order_by('-fecha_asignacion')
+
         queryset = HistorialMovimientoEquipo.objects.all()
         
         is_admin = False
@@ -466,7 +477,7 @@ class HistorialMovimientoEquipoListAPIView(generics.ListAPIView):
                     Q(equipo__sede_id=sede_id) |
                     Q(empleado_asignado__sede_id=sede_id)
                 )
-            return queryset
+            return queryset.order_by('-fecha_asignacion')
 
         # Si no es admin, filtrar por sede del usuario
         if user_profile and hasattr(user_profile, 'sede') and user_profile.sede:
@@ -475,7 +486,7 @@ class HistorialMovimientoEquipoListAPIView(generics.ListAPIView):
                 Q(sede=user_profile.sede) |
                 Q(equipo__sede=user_profile.sede) |
                 Q(empleado_asignado__sede=user_profile.sede)
-            )
+            ).order_by('-fecha_asignacion')
 
         return HistorialMovimientoEquipo.objects.none()
 
